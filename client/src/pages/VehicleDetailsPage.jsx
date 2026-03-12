@@ -6,9 +6,8 @@ import api, { getApiError } from "../api/http";
 import useAuth from "../hooks/useAuth";
 import LoadingScreen from "../components/LoadingScreen";
 import PaymentForm from "../components/PaymentForm";
-
-const fallbackImage =
-  "https://images.unsplash.com/photo-1549925862-990f9b473f13?auto=format&fit=crop&w=1200&q=80";
+import VehiclePoster from "../components/VehiclePoster";
+import { getVehicleDisplayName, getVehicleTheme } from "../utils/vehicleTheme";
 
 export default function VehicleDetailsPage() {
   const { id } = useParams();
@@ -23,6 +22,7 @@ export default function VehicleDetailsPage() {
   const [availability, setAvailability] = useState(null);
   const [booking, setBooking] = useState(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const theme = vehicle ? getVehicleTheme(vehicle.type) : null;
 
   const dayCount = useMemo(() => {
     const start = dayjs(dates.startDate);
@@ -102,33 +102,58 @@ export default function VehicleDetailsPage() {
 
   return (
     <div className="stack-lg">
-      <section className="grid grid-2">
-        <img className="detail-image" src={vehicle.images?.[0] || fallbackImage} alt={vehicle.model} />
-        <article className="card stack">
-          <h1>
-            {vehicle.brand} {vehicle.model}
-          </h1>
-          <p className="muted">{vehicle.description || "Premium rental vehicle with verified documents."}</p>
-          <p>
-            <strong>Type:</strong> {vehicle.type}
-          </p>
-          <p>
-            <strong>Transmission:</strong> {vehicle.transmission}
-          </p>
-          <p>
-            <strong>Fuel:</strong> {vehicle.fuelType}
-          </p>
-          <p>
-            <strong>Seats:</strong> {vehicle.seats}
-          </p>
-          <p>
-            <strong>Location:</strong> {vehicle.location}
-          </p>
-          <p className="price">INR {vehicle.pricePerDay}/day</p>
+      <section className="grid grid-2 detail-hero-grid">
+        <VehiclePoster vehicle={vehicle} />
+
+        <article className="card stack detail-summary">
+          <span
+            className="detail-tag"
+            style={{
+              background: theme?.accentSoft,
+              color: theme?.accent || "#0d3b66",
+            }}
+          >
+            {vehicle.type.toUpperCase()}
+          </span>
+
+          <h1>{getVehicleDisplayName(vehicle)}</h1>
+          <p className="muted">{vehicle.description || "Premium rental vehicle with verified details."}</p>
+
+          <div className="detail-meta-grid">
+            <div className="detail-meta-card">
+              <span>Brand</span>
+              <strong>{vehicle.brand}</strong>
+            </div>
+            <div className="detail-meta-card">
+              <span>Model</span>
+              <strong>{vehicle.model}</strong>
+            </div>
+            <div className="detail-meta-card">
+              <span>Transmission</span>
+              <strong>{vehicle.transmission}</strong>
+            </div>
+            <div className="detail-meta-card">
+              <span>Fuel</span>
+              <strong>{vehicle.fuelType}</strong>
+            </div>
+            <div className="detail-meta-card">
+              <span>Seats</span>
+              <strong>{vehicle.seats}</strong>
+            </div>
+            <div className="detail-meta-card">
+              <span>Location</span>
+              <strong>{vehicle.location}</strong>
+            </div>
+          </div>
+
+          <div className="detail-price-row">
+            <p className="price">INR {vehicle.pricePerDay}/day</p>
+            <span className="muted">Year {vehicle.year || "N/A"}</span>
+          </div>
         </article>
       </section>
 
-      <section className="card stack">
+      <section className="card stack booking-surface">
         <h2>Book This Vehicle</h2>
         <div className="grid grid-3">
           <label>
@@ -154,7 +179,7 @@ export default function VehicleDetailsPage() {
           </div>
         </div>
 
-        <div className="row gap">
+        <div className="row gap wrap">
           <button className="btn btn-small" type="button" onClick={checkAvailability}>
             Check Availability
           </button>

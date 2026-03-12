@@ -3,6 +3,93 @@ const connectDatabase = require("../config/db");
 const User = require("../models/User");
 const Vehicle = require("../models/Vehicle");
 
+const sampleVehicles = [
+  {
+    name: "Honda City ZX",
+    brand: "Honda",
+    model: "City ZX",
+    type: "sedan",
+    year: 2024,
+    seats: 5,
+    transmission: "automatic",
+    fuelType: "petrol",
+    location: "Bangalore",
+    pricePerDay: 2500,
+    images: [],
+    description: "A polished sedan for airport runs, city meetings, and long urban commutes.",
+  },
+  {
+    name: "Mahindra XUV700 AX7",
+    brand: "Mahindra",
+    model: "XUV700 AX7",
+    type: "suv",
+    year: 2024,
+    seats: 7,
+    transmission: "automatic",
+    fuelType: "diesel",
+    location: "Hyderabad",
+    pricePerDay: 4200,
+    images: [],
+    description: "A full-size SUV tuned for family travel, highway comfort, and weekend road trips.",
+  },
+  {
+    name: "Tata Nexon EV Empowered",
+    brand: "Tata",
+    model: "Nexon EV Empowered",
+    type: "ev",
+    year: 2024,
+    seats: 5,
+    transmission: "automatic",
+    fuelType: "electric",
+    location: "Chennai",
+    pricePerDay: 3000,
+    images: [],
+    description: "A quiet electric option with modern cabin tech and low running cost for urban rentals.",
+  },
+  {
+    name: "Toyota Innova HyCross GX",
+    brand: "Toyota",
+    model: "Innova HyCross GX",
+    type: "van",
+    year: 2024,
+    seats: 8,
+    transmission: "automatic",
+    fuelType: "hybrid",
+    location: "Mumbai",
+    pricePerDay: 4800,
+    images: [],
+    description: "Built for group movement, airport transfers, and comfortable intercity family travel.",
+  },
+  {
+    name: "Royal Enfield Meteor 350",
+    brand: "Royal Enfield",
+    model: "Meteor 350",
+    type: "bike",
+    year: 2024,
+    seats: 2,
+    transmission: "manual",
+    fuelType: "petrol",
+    location: "Goa",
+    pricePerDay: 1400,
+    images: [],
+    description: "A relaxed cruiser bike for scenic coastal routes and easy weekend rides.",
+  },
+  {
+    name: "BMW 330Li M Sport",
+    brand: "BMW",
+    model: "330Li M Sport",
+    type: "luxury",
+    year: 2024,
+    seats: 5,
+    transmission: "automatic",
+    fuelType: "petrol",
+    location: "Delhi",
+    pricePerDay: 9500,
+    images: [],
+    description: "A premium long-wheelbase sedan for executive travel, events, and high-comfort rentals.",
+  },
+];
+
 const run = async () => {
   try {
     await connectDatabase();
@@ -22,56 +109,15 @@ const run = async () => {
       console.log(`Created demo customer: ${customerEmail} / Customer@123`);
     }
 
-    const existingVehicles = await Vehicle.countDocuments();
-    if (existingVehicles === 0) {
-      await Vehicle.insertMany([
-        {
-          name: "City Cruiser",
-          brand: "Honda",
-          model: "City",
-          type: "sedan",
-          year: 2023,
-          seats: 5,
-          transmission: "automatic",
-          fuelType: "petrol",
-          location: "Bangalore",
-          pricePerDay: 2500,
-          images: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80"],
-          description: "Comfortable sedan for city and highway drives.",
-        },
-        {
-          name: "Adventure X",
-          brand: "Mahindra",
-          model: "XUV700",
-          type: "suv",
-          year: 2024,
-          seats: 7,
-          transmission: "automatic",
-          fuelType: "diesel",
-          location: "Hyderabad",
-          pricePerDay: 4200,
-          images: ["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"],
-          description: "Spacious SUV for family trips and weekend getaways.",
-        },
-        {
-          name: "Eco Spark",
-          brand: "Tata",
-          model: "Nexon EV",
-          type: "ev",
-          year: 2024,
-          seats: 5,
-          transmission: "automatic",
-          fuelType: "electric",
-          location: "Chennai",
-          pricePerDay: 3000,
-          images: ["https://images.unsplash.com/photo-1617531653332-bd46c24f2068?auto=format&fit=crop&w=1200&q=80"],
-          description: "Electric SUV with modern features and fast charging support.",
-        },
-      ]);
-      console.log("Inserted sample vehicles.");
-    } else {
-      console.log("Vehicles already exist, skipped vehicle seeding.");
+    for (const vehicle of sampleVehicles) {
+      await Vehicle.findOneAndUpdate(
+        { brand: vehicle.brand, model: vehicle.model },
+        { $set: vehicle },
+        { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+      );
     }
+
+    console.log(`Upserted ${sampleVehicles.length} sample vehicles.`);
 
     console.log("Sample seed complete.");
     process.exit(0);

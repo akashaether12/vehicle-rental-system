@@ -58,17 +58,17 @@ export default function VehiclesPage() {
 
   return (
     <div className="stack-lg">
-      <section className="section">
+      <section className="section fleet-header">
         <div className="section-head">
           <h1>Browse Vehicles</h1>
-          <p>Search by vehicle type, budget, and date availability.</p>
+          <p>Filter by trip dates, budget, and vehicle class without losing a clean comparison view.</p>
         </div>
 
-        <form className="card filter-form" onSubmit={handleSearch}>
+        <form className="card filter-form filter-surface" onSubmit={handleSearch}>
           <div className="grid grid-6">
             <input
               name="search"
-              placeholder="Search by brand/model/location"
+              placeholder="Search by name, brand, model, or location"
               value={filters.search}
               onChange={handleChange}
             />
@@ -112,13 +112,16 @@ export default function VehiclesPage() {
             </select>
           </div>
 
-          <div className="row gap">
+          <div className="row gap wrap">
             <button className="btn btn-small" type="submit">
               Search
             </button>
             <button className="btn btn-ghost btn-small" type="button" onClick={clearFilters}>
               Reset
             </button>
+            <span className="results-inline">
+              {loading ? "Refreshing fleet..." : `${vehicles.length} vehicle${vehicles.length === 1 ? "" : "s"}`}
+            </span>
           </div>
         </form>
       </section>
@@ -130,7 +133,7 @@ export default function VehiclesPage() {
           <p>No vehicles match your filters.</p>
         </div>
       ) : (
-        <section className="grid grid-3">
+        <section className="grid grid-3 vehicle-results-grid">
           {vehicles.map((vehicle) => (
             <VehicleCard key={vehicle._id} vehicle={vehicle} />
           ))}
